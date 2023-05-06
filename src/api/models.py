@@ -15,10 +15,9 @@ class User(db.Model):
 
     def serialize(self):
         return {
-            "id": self.id,
+            "user id": self.id,
             "email": self.email,
             "username": self.username
-            # do not serialize the password, its a security breach
         }
 
 
@@ -30,6 +29,13 @@ class Character(db.Model):
 
     def __repr__(self):
         return f"{self.name}"
+    
+    def serialize(self):
+        return {
+            "character id": self.id,
+            "name": self.name,
+            "species": self.species
+        }
 
 
 class Location(db.Model):
@@ -40,6 +46,13 @@ class Location(db.Model):
 
     def __repr__(self):
         return f"{self.name}"
+    
+    def serialize(self):
+        return {
+            "lcoation id": self.id,
+            "name": self.name,
+            "type": self.type
+        }
 
 
 class Episode(db.Model):
@@ -50,6 +63,13 @@ class Episode(db.Model):
 
     def __repr__(self):
        return f"{self.name}"
+    
+    def serialize(self):
+        return {
+            "episode id": self.id,
+            "name": self.name,
+            "air_date": self.air_date
+        }
 
 
 class UserFavourite(db.Model):
@@ -58,4 +78,36 @@ class UserFavourite(db.Model):
     character_id = db.Column(db.Integer, db.ForeignKey("character.id"), nullable=True)
     location_id = db.Column(db.Integer, db.ForeignKey("location.id"), nullable=True)
     episode_id = db.Column(db.Integer, db.ForeignKey("episode.id"), nullable=True)
-   
+
+    def __repr__(self):
+        return f"UserFavourite(user_id={self.user_id}, character_id={self.character_id}, location_id={self.location_id}, episode_id={self.episode_id})"
+
+    def serialize(self):
+        serialized = {
+            "favourite id": self.id,
+            "user_id": self.user_id,
+        }
+        
+        if self.character:
+            serialized["character"] = {
+                "character id": self.character.id,
+                "name": self.character.name,
+                "species": self.character.species
+            }
+            
+        if self.location:
+            serialized["location"] = {
+                "location id": self.location.id,
+                "name": self.location.name,
+                "type": self.location.type
+            }
+            
+        if self.episode:
+            serialized["episode"] = {
+                "episode id": self.episode.id,
+                "name": self.episode.name,
+                "air_date": self.episode.air_date
+            }
+        
+        return serialized
+

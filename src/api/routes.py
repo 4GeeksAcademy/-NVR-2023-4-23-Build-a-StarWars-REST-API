@@ -149,7 +149,7 @@ def user_favourites(target_user_id):
 
 # Post functions
 
-@api.route('/users', methods=['POST'])
+@api.route('/users', methods=["POST"])
 def create_user():
   
     body= request.json
@@ -161,7 +161,7 @@ def create_user():
     users_serialzied =  [user.serialize() for user  in users]
     return jsonify({"All users": users_serialzied}), 200
 
-@api.route('/characters', methods=['POST'])
+@api.route('/characters', methods=["POST"])
 def create_character():
   
     body= request.json
@@ -173,7 +173,7 @@ def create_character():
     characters_serialzied =  [character.serialize() for character  in characters]
     return jsonify({"All characters": characters_serialzied}), 200
 
-@api.route('/locations', methods=['POST'])
+@api.route('/locations', methods=["POST"])
 def create_location():
   
     body= request.json
@@ -185,7 +185,7 @@ def create_location():
     locations_serialzied =  [location.serialize() for location  in locations]
     return jsonify({"All locations": locations_serialzied}), 200
 
-@api.route('/episodes', methods=['POST'])
+@api.route('/episodes', methods=["POST"])
 def create_episode():
   
     body= request.json
@@ -196,3 +196,54 @@ def create_episode():
     episodes = Episode.query.all()
     episodes_serialzied =  [episode.serialize() for episode  in episodes]
     return jsonify({"All episodes": episodes_serialzied}), 200
+
+@api.route("/favourites/characters", methods=["POST"])
+def create_favourite_character():
+    
+    body= request.json
+    target_user = User.query.filter_by(id=body["user_id"]).first()
+    target_character = Character.query.filter_by(id=body["character_id"]).first()
+    if not target_user:
+        return jsonify({"Message": "User not found"}), 404
+    if not target_character:
+        return jsonify({"Message": "Character not found"}), 404
+   
+    new_favourite = UserFavourite(user_id=target_user.id, character_id=target_character.id)
+    db.session.add(new_favourite)
+    db.session.commit()
+    return jsonify({"Message": "Favourite Character sucessfully added"}), 200
+
+@api.route("/favourites/locations", methods=["POST"])
+def create_favourite_location():
+    
+    body= request.json
+    target_user = User.query.filter_by(id=body["user_id"]).first()
+    target_location = Location.query.filter_by(id=body["location_id"]).first()
+    if not target_user:
+        return jsonify({"Message": "User not found"}), 404
+    if not target_location:
+        return jsonify({"Message": "Location not found"}), 404
+   
+    new_favourite = UserFavourite(user_id=target_user.id, location_id=target_location.id)
+    db.session.add(new_favourite)
+    db.session.commit()
+    return jsonify({"Message": "Favourite Loation sucessfully added"}), 200
+
+@api.route("/favourites/episodes", methods=["POST"])
+def create_favourite_episode():
+    
+    body= request.json
+    target_user = User.query.filter_by(id=body["user_id"]).first()
+    target_episode = Episode.query.filter_by(id=body["episode_id"]).first()
+    if not target_user:
+        return jsonify({"Message": "User not found"}), 404
+    if not target_episode:
+        return jsonify({"Message": "Episode not found"}), 404
+   
+    new_favourite = UserFavourite(user_id=target_user.id, episode_id=target_episode.id)
+    db.session.add(new_favourite)
+    db.session.commit()
+    return jsonify({"Message": "Favourite episode sucessfully added"}), 200
+
+   
+

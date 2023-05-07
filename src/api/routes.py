@@ -146,3 +146,53 @@ def user_favourites(target_user_id):
     favourites = UserFavourite.query.filter_by(user_id=target_user_id).all()
     favourites_serialized = [favourite.serialize() for favourite in favourites]
     return jsonify({"favorites": favourites_serialized}), 200
+
+# Post functions
+
+@api.route('/users', methods=['POST'])
+def create_user():
+  
+    body= request.json
+    new_user = User(username=body["username"] , email=body["email"] , password=body["password"], is_active=True)
+    db.session.add(new_user)
+    db.session.commit()
+
+    users = User.query.all()
+    users_serialzied =  [user.serialize() for user  in users]
+    return jsonify({"All users": users_serialzied}), 200
+
+@api.route('/characters', methods=['POST'])
+def create_character():
+  
+    body= request.json
+    new_character = Character(name=body["name"] , species=body["species"])
+    db.session.add(new_character)
+    db.session.commit()
+
+    characters = Character.query.all()
+    characters_serialzied =  [character.serialize() for character  in characters]
+    return jsonify({"All characters": characters_serialzied}), 200
+
+@api.route('/locations', methods=['POST'])
+def create_location():
+  
+    body= request.json
+    new_location = Location(name=body["name"] , type=body["type"])
+    db.session.add(new_location)
+    db.session.commit()
+
+    locations = Location.query.all()
+    locations_serialzied =  [location.serialize() for location  in locations]
+    return jsonify({"All locations": locations_serialzied}), 200
+
+@api.route('/episodes', methods=['POST'])
+def create_episode():
+  
+    body= request.json
+    new_episode = Episode(name=body["name"] , air_date=body["air_date"])
+    db.session.add(new_episode)
+    db.session.commit()
+
+    episodes = Episode.query.all()
+    episodes_serialzied =  [episode.serialize() for episode  in episodes]
+    return jsonify({"All episodes": episodes_serialzied}), 200

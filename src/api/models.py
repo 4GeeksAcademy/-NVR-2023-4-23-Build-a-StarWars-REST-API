@@ -111,3 +111,4 @@ class UserFavourite(db.Model):
         
         return serialized
 
+

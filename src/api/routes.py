@@ -129,9 +129,9 @@ def user_favourites(target_user_id):
     favourites_serialized = [favourite.serialize() for favourite in favourites]
     return jsonify({"favorites": favourites_serialized}), 200
 
-# Post endpoints
+# POST endpoints
 
-@api.route('/users', methods=["POST"])
+@api.route("/users", methods=["POST"])
 def create_user():
   
     body= request.json
@@ -140,7 +140,7 @@ def create_user():
     db.session.commit()
     return jsonify({"Message":"User sucessfully created"}), 200
 
-@api.route('/characters', methods=["POST"])
+@api.route("/characters", methods=["POST"])
 def create_character():
   
     body= request.json
@@ -149,7 +149,7 @@ def create_character():
     db.session.commit()
     return jsonify({"Message":"Character sucessfully created"}), 200
 
-@api.route('/locations', methods=["POST"])
+@api.route("/locations", methods=["POST"])
 def create_location():
   
     body= request.json
@@ -158,7 +158,7 @@ def create_location():
     db.session.commit()
     return jsonify({"Message":"Location sucessfully created"}), 200
 
-@api.route('/episodes', methods=["POST"])
+@api.route("/episodes", methods=["POST"])
 def create_episode():
   
     body= request.json
@@ -217,7 +217,7 @@ def create_favourite_episode():
 
 # PUT endpoints
 
-@api.route('/users/<int:user_id>', methods=['PUT'])
+@api.route("/users/<int:user_id>", methods=["PUT"])
 def update_user(user_id):
     body = request.json
     target_user = User.query.filter_by(id=user_id).first()
@@ -234,7 +234,7 @@ def update_user(user_id):
     return jsonify({"Message": "User successfully updated"}), 200
 
 
-@api.route('/characters/<int:character_id>', methods=['PUT'])
+@api.route("/characters/<int:character_id>", methods=["PUT"])
 def update_character(character_id):
     body = request.json
     target_character = Character.query.filter_by(id=character_id).first()
@@ -248,7 +248,7 @@ def update_character(character_id):
     return jsonify({"Message": "Character successfully updated"}), 200
 
 
-@api.route('/locations/<int:location_id>', methods=['PUT'])
+@api.route("/locations/<int:location_id>", methods=["PUT"])
 def update_location(location_id):
     body = request.json
     target_location = Location.query.filter_by(id=location_id).first()
@@ -261,7 +261,7 @@ def update_location(location_id):
 
     return jsonify({"Message": "Location successfully updated"}), 200
 
-@api.route('/episodes/<int:episode_id>', methods=['PUT'])
+@api.route("/episodes/<int:episode_id>", methods=["PUT"])
 def update_episode(episode_id):
     body = request.json
     target_episode = Episode.query.filter_by(id=episode_id).first()
@@ -274,23 +274,121 @@ def update_episode(episode_id):
 
     return jsonify({"Message": "Episode successfully updated"}), 200
 
-@api.route('/favourites/<int:favourite_id>', methods=['PUT'])
+@api.route("/favourites/<int:favourite_id>", methods=["PUT"])
 def update_favourite(favourite_id):
+    
     body = request.json
-    if "user_id" not in body:
-        return jsonify({"Message": "user_id is required in the request body"}), 400
-
+    
     target_favourite = UserFavourite.query.filter_by(id=favourite_id).first()
     if not target_favourite:
-        return jsonify({"Message": "Favourite not found"}), 404
+        return jsonify({"message": "Favourite not found"}), 404
 
-    target_favourite.user_id = body.get("user_id", None)
-    target_favourite.character_id = body.get("character_id", None)
-    target_favourite.location_id = body.get("location_id", None)
-    target_favourite.episode_id = body.get("episode_id", None)
+    if 'user_id' in body:
+        target_favourite.user_id = body['user_id']
+
+    target_favourite.character_id = None 
+    target_favourite.episode_id = None 
+    target_favourite.location_id = None 
+    
+    if "character_id" in body:
+        target_favourite.character_id = body['character_id']
+
+    if "location_id" in body:
+        target_favourite.location_id = body['location_id']
+    
+    if "episode_id" in body:
+        target_favourite.episode_id = body['episode_id']
 
     db.session.commit()
+    return jsonify({"message": "Favourite successfully updated"}), 200
 
-    return jsonify({"Message": "Favourite successfully updated"}), 200
 
+# DELETE endpoints
+# Favourite is first, because it doesn't require rewriting tables other than itself
+# Other DELETE endpoints will need to check if entries in FAvourite reference tehm and if so, delete them as well
 
+@api.route("/favourites/<int:favourite_id>", methods=['DELETE'])
+def delete_favourite(favourite_id):
+  
+   target_favourite = UserFavourite.query.filter_by(id=favourite_id).first()
+   if not target_favourite:
+        return jsonify({"message": "Favourite not found"}), 400
+
+   db.session.delete(target_favourite)
+   db.session.commit()
+   return jsonify({"message": "Favourite sucessfully deleted"}), 200
+
+@api.route("/users/<int:user_id>", methods=["DELETE"])
+def delete_user(user_id):
+    target_user = User.query.filter_by(id=user_id).first()
+    if not target_user:
+        return jsonify({"message": "User not found"}), 400
+
+    UserFavourite.query.filter_by(user_id=target_user.id).delete()
+
+    db.session.delete(target_user)
+    db.session.commit()
+
+    return jsonify({"message": "User successfully deleted"}), 200
+
+@api.route("/characters/<int:character_id>", methods=["DELETE"])
+def delete_character(character_id):
+    target_character = Character.query.filter_by(id=character_id).first()
+    if not target_character:
+        return jsonify({"message": "Character not found"}), 400
+
+    UserFavourite.query.filter_by(character_id=target_character.id).delete()
+
+    db.session.delete(target_character)
+    db.session.commit()
+
+    return jsonify({"message": "Character successfully deleted"}), 200
+
+@api.route("/locations/<int:location_id>", methods=["DELETE"])
+def delete_location(location_id):
+    target_location = Location.query.filter_by(id=location_id).first()
+    if not target_location:
+        return jsonify({"message": "Location not found"}), 400
+
+    UserFavourite.query.filter_by(location_id=target_location.id).delete()
+
+    db.session.delete(target_location)
+    db.session.commit()
+
+    return jsonify({"message": "Location successfully deleted"}), 200
+
+@api.route("/episodes/<int:episode_id>", methods=["DELETE"])
+def delete_episode(episode_id):
+    target_episode = Episode.query.filter_by(id=episode_id).first()
+    if not target_episode:
+        return jsonify({"message": "Episode not found"}), 400
+
+    UserFavourite.query.filter_by(episode_id=target_episode.id).delete()
+
+    db.session.delete(target_episode)
+    db.session.commit()
+
+    return jsonify({"message": "Episode successfully deleted"}), 200
+
+# Returns the content of all tables
+@api.route("/tables")
+def get_all_tables():
+    users = User.query.all()
+    characters = Character.query.all()
+    locations = Location.query.all()
+    episodes = Episode.query.all()
+    user_favourites = UserFavourite.query.all()
+    
+    serialized_users = [user.serialize() for user in users]
+    serialized_characters = [character.serialize() for character in characters]
+    serialized_locations = [location.serialize() for location in locations]
+    serialized_episodes = [episode.serialize() for episode in episodes]
+    serialized_user_favourites = [favourite.serialize() for favourite in user_favourites]
+    
+    return jsonify({
+        "users": serialized_users,
+        "characters": serialized_characters,
+        "locations": serialized_locations,
+        "episodes": serialized_episodes,
+        "userfavourites": serialized_user_favourites
+    })

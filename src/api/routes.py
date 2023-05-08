@@ -304,8 +304,7 @@ def update_favourite(favourite_id):
 
 
 # DELETE endpoints
-# Favourite is first, because it doesn't require rewriting tables other than itself
-# Other DELETE endpoints will need to check if entries in FAvourite reference tehm and if so, delete them as well
+# All DELETE endpoints except /favourites check if entry to be deleetd is referenced in UserFavourite. If so, the UserFavourite entry is deleted as well, to avoid inconsistencies.
 
 @api.route("/favourites/<int:favourite_id>", methods=['DELETE'])
 def delete_favourite(favourite_id):

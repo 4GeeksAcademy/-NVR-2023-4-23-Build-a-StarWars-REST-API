@@ -1,3 +1,15 @@
+***************************************************************************************************************
+Exercise #23: Basic Ricky and Morty reading Blog rest API with Python,Flask/SQL Alchemy.
+Implemented Bonus features: GET, POST, PUT and DELETE endpoints implemneted for all tables - User, Character, Location, Episode and UserFavourite. Additional Get-by-id endpoints implemented
+
+
+By Nuno Rodrigues
+
+Mark received:
+Date: 
+Teacher:
+***************************************************************************************************************
+
 # WebApp boilerplate with React JS and Flask API
 
 Build web applications using React.js for the front end and python/flask for your backend API.

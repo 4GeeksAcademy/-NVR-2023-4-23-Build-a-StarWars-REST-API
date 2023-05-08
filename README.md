@@ -1,6 +1,6 @@
 ***************************************************************************************************************
 Exercise #23: Basic Ricky and Morty reading Blog rest API with Python,Flask/SQL Alchemy.
-Implemented Bonus features: GET, POST, PUT and DELETE endpoints implemneted for all tables - User, Character, Location, Episode and UserFavourite. Additional Get-by-id endpoints implemented
+Implemented "Feeling Confident" bonus features: GET, POST, PUT and DELETE endpoints implemneted for all tables - User, Character, Location, Episode and UserFavourite. Additional Get-by-id endpoints set.
 
 
 By Nuno Rodrigues
